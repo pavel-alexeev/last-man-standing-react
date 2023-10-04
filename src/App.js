@@ -38,8 +38,6 @@ export default function App() {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [team, setTeam] = useState("");
 
-  console.log(selectedParticipant?.selectedTeams);
-
   function showFormSelectTeam() {
     setSelectTeam((show) => !show);
   }
@@ -49,18 +47,18 @@ export default function App() {
   }
 
   function handleSelection(participant) {
-    console.log(participant);
     showFormSelectTeam();
     setSelectedParticipant(participant);
   }
 
   function handleSubmitForm(e) {
     e.preventDefault();
-    console.log(team);
     hideFormSelectTeam();
+    // selectedParticipant.selectedTeams.push(team);
+    // console.log(selectedParticipant.selectedTeams.includes(team));
+    if (selectedParticipant.selectedTeams.includes(team))
+      return alert("You can't select same team twice! Pick different team");
     selectedParticipant.selectedTeams.push(team);
-    console.log(selectedParticipant);
-    console.log(participants);
   }
 
   function teamSelection(e) {
@@ -134,7 +132,7 @@ function Participant({
         <p className="points">{points1}</p>
       </div>
       <Button onClick={() => onHandleSelection(participant)}>Pick Team</Button>
-      <p>Following gameweek team: {[...participant.selectedTeams]}</p>
+      <p>Following gameweek team: {[...participant.selectedTeams.slice(-1)]}</p>
       {/* <div>
         <p>{participant.selectedTeams}</p>
       </div> */}
@@ -145,8 +143,6 @@ function Participant({
 function FormSelectTeam({ onHandleSubmitForm, teamSelection }) {
   const [league, setLeague] = useState("");
   // const [team, setTeam] = useState("");
-
-  console.log(league);
 
   const premierLeagueTeams = [
     "Arsenal",
@@ -260,8 +256,8 @@ function FormSelectTeam({ onHandleSubmitForm, teamSelection }) {
 function ParticipantsSelectedTeams({ participants }) {
   return (
     <div className="selectedTeams">
-      {/* <h3>Selected teams by participant</h3>
-      <table className="teamsTable">
+      <h3>Selected teams by participant</h3>
+      {/* <table className="teamsTable">
         <tr>
           {participants.map((participant) => (
             <th>{participant.name}</th>
@@ -275,7 +271,16 @@ function ParticipantsSelectedTeams({ participants }) {
       </table> */}
       {participants.map((participant) => (
         <p>
-          {participant.name} - {participant.selectedTeams}
+          {participant.name} -
+          {/* {participants.map((teams) => [...teams.selectedTeams])} */}
+          {/* <span>{[...participant.selectedTeams]}</span> */}
+          {participant.selectedTeams.map((teams, i) => (
+            <span key={participant.id}>
+              {(i ? `, (${i + 1}) ` : "(1) ") + teams}
+
+              {/* {participant.selectedTeams.length < teams[i] ? "," : ""} */}
+            </span>
+          ))}
         </p>
       ))}
     </div>
