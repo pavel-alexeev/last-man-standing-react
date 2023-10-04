@@ -69,18 +69,21 @@ export default function App() {
 
   return (
     <div className="App">
-      <ParticipantList
-        participants={participants}
-        onShowFormSelectTeam={showFormSelectTeam}
-        onHandleSelection={handleSelection}
-      />
-      {selectTeam && (
-        <FormSelectTeam
-          onHideFormSelectTeam={hideFormSelectTeam}
-          onHandleSubmitForm={handleSubmitForm}
-          teamSelection={teamSelection}
+      <div className="section--1">
+        <ParticipantList
+          participants={participants}
+          onShowFormSelectTeam={showFormSelectTeam}
+          onHandleSelection={handleSelection}
         />
-      )}
+        {selectTeam && (
+          <FormSelectTeam
+            onHideFormSelectTeam={hideFormSelectTeam}
+            onHandleSubmitForm={handleSubmitForm}
+            teamSelection={teamSelection}
+          />
+        )}
+      </div>
+      <ParticipantsSelectedTeams participants={participants} />
     </div>
   );
 }
@@ -131,7 +134,10 @@ function Participant({
         <p className="points">{points1}</p>
       </div>
       <Button onClick={() => onHandleSelection(participant)}>Pick Team</Button>
-      <p>Following gameweek team: X</p>
+      <p>Following gameweek team: {[...participant.selectedTeams]}</p>
+      {/* <div>
+        <p>{participant.selectedTeams}</p>
+      </div> */}
     </li>
   );
 }
@@ -247,6 +253,31 @@ function FormSelectTeam({ onHandleSubmitForm, teamSelection }) {
         )}
         <Button>Submit</Button>
       </form>
+    </div>
+  );
+}
+
+function ParticipantsSelectedTeams({ participants }) {
+  return (
+    <div className="selectedTeams">
+      {/* <h3>Selected teams by participant</h3>
+      <table className="teamsTable">
+        <tr>
+          {participants.map((participant) => (
+            <th>{participant.name}</th>
+          ))}
+        </tr>
+        <tr>
+          {participants.map((teams) => (
+            <td className="selectedTeams">{teams.selectedTeams}</td>
+          ))}
+        </tr>
+      </table> */}
+      {participants.map((participant) => (
+        <p>
+          {participant.name} - {participant.selectedTeams}
+        </p>
+      ))}
     </div>
   );
 }

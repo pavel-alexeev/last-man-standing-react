@@ -19,8 +19,13 @@ code {
 .App {
   display: flex;
   justify-content: center;
+  flex-direction: column;
   /* margin: 0 auto; */
   width: 85%;
+}
+
+.section--1 {
+  display: flex;
 }
 
 .btn {
@@ -132,4 +137,18 @@ code {
   padding: 0.5rem 1.5rem;
   border: none;
   cursor: pointer;
+}
+
+.selectedTeams {
+  margin-top: 30px;
+  margin-left: 20px;
+}
+
+.teamsTable th {
+  border: 1px solid black;
+}
+
+.selectedTeams {
+  /* display: flex; */
+  /* justify-content: space-around; */
 }
