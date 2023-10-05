@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const gameParticipants = [
   {
@@ -38,6 +38,16 @@ export default function App() {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [team, setTeam] = useState("");
 
+  useEffect(() => {
+    const data = window.localStorage.getItem("MY_APP");
+    if (data !== null) setParticipants(JSON.parse(data));
+    console.log("data", data);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("MY_APP", JSON.stringify(participants));
+  }, [participants]);
+
   function showFormSelectTeam() {
     setSelectTeam((show) => !show);
   }
@@ -59,6 +69,7 @@ export default function App() {
     if (selectedParticipant.selectedTeams.includes(team))
       return alert("You can't select same team twice! Pick different team");
     selectedParticipant.selectedTeams.push(team);
+    console.log(selectedParticipant.selectedTeams);
   }
 
   function teamSelection(e) {
@@ -120,12 +131,12 @@ function Participant({
 
   return (
     <li
+      key={participant.id}
       className={`participant ${
         participant.favouriteTeam === "Chelsea FC"
           ? "chelsea-background"
           : "manutd-background"
       }`}
-      key={participant.id}
     >
       <div className="participant-block" onClick={handlePoints}>
         <h3>{participant.name}</h3>

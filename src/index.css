@@ -35,7 +35,7 @@ code {
 }
 
 .participant-list {
-  width: 70%;
+  width: 60%;
 }
 
 .participant {
@@ -114,10 +114,11 @@ code {
 }
 
 .team-selection {
+  width: 40%;
   display: flex;
   align-items: center;
-  flex-direction: column;
-  justify-content: space-evenly;
+  /* flex-direction: column; */
+  /* justify-content: space-evenly; */
   height: 10rem;
 }
 
@@ -126,6 +127,10 @@ code {
   align-items: flex-end;
   column-gap: 1rem;
   margin-left: 2rem;
+}
+
+.team-selection__form > div {
+  width: 130px;
 }
 
 .team-selection div > select {
