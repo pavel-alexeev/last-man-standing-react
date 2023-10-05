@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const gameParticipants = [
   {
@@ -38,6 +38,24 @@ export default function App() {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [team, setTeam] = useState("");
 
+  // console.log(...participants);
+
+  // const stringifiedObj = JSON.stringify(participants);
+  // localStorage.setItem("MY_APP", stringifiedObj);
+
+  // const userInfo = localStorage.getItem("MY_APP");
+
+  // const userInfoParsed = JSON.parse(userInfo);
+
+  // useEffect(() => {
+  //   const storedData = window.localStorage.getItem("MY_APP");
+  //   if (storedData !== null) setParticipants(JSON.parse(storedData));
+  // }, []);
+
+  // useEffect(() => {
+  //   window.localStorage.setItem("MY_APP", JSON.stringify(participants));
+  // }, [participants]);
+
   function showFormSelectTeam() {
     setSelectTeam((show) => !show);
   }
@@ -54,11 +72,12 @@ export default function App() {
   function handleSubmitForm(e) {
     e.preventDefault();
     hideFormSelectTeam();
-    // selectedParticipant.selectedTeams.push(team);
-    // console.log(selectedParticipant.selectedTeams.includes(team));
+    // console.log(participants.slice(0));
     if (selectedParticipant.selectedTeams.includes(team))
       return alert("You can't select same team twice! Pick different team");
     selectedParticipant.selectedTeams.push(team);
+    // console.log(participants, team);
+    console.log(selectedParticipant);
   }
 
   function teamSelection(e) {
@@ -82,6 +101,36 @@ export default function App() {
         )}
       </div>
       <ParticipantsSelectedTeams participants={participants} />
+      <Input />
+    </div>
+  );
+}
+
+// Example
+function Input() {
+  const storedItems = JSON.parse(localStorage.getItem("MY_APP"));
+
+  const [input, setInput] = useState(storedItems);
+  console.log(input);
+  // useEffect(() => {
+  //   const storedData = window.localStorage.getItem("MY_APP");
+  //   if (storedData !== null) setInput(JSON.parse(storedData));
+  // }, []);
+
+  useEffect(() => {
+    localStorage.setItem("MY_APP", JSON.stringify(input));
+  }, [input]);
+
+  function someInput(e) {
+    e.preventDefault();
+    setInput(e.target.value);
+  }
+  return (
+    <div>
+      <form onSubmit={someInput}>
+        <input type="text" />
+        <button type="submit">Submit</button>
+      </form>
     </div>
   );
 }
