@@ -31,7 +31,6 @@ function Button({ onClick, children }) {
     </button>
   );
 }
-
 export default function App() {
   const [participants, setParticipants] = useState(gameParticipants);
   const [selectTeam, setSelectTeam] = useState(false);
@@ -39,19 +38,15 @@ export default function App() {
   const [team, setTeam] = useState("");
 
   useEffect(() => {
-    const data = window.localStorage.getItem("MY_APP");
-    if (data !== null) setParticipants(JSON.parse(data));
-    console.log("data", data);
+    const data = localStorage.getItem("MY_APP");
+    // setParticipants(JSON.parse(data));
+    // const items = JSON.parse(localStorage.getItem("MY_APP"));
+    if (data) setParticipants(JSON.parse(data));
+    // return data ? JSON.parse(data) : [];
   }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem("MY_APP", JSON.stringify(participants));
-  }, [participants]);
-
   function showFormSelectTeam() {
     setSelectTeam((show) => !show);
   }
-
   function hideFormSelectTeam() {
     setSelectTeam(false);
   }
@@ -64,18 +59,23 @@ export default function App() {
   function handleSubmitForm(e) {
     e.preventDefault();
     hideFormSelectTeam();
-    // selectedParticipant.selectedTeams.push(team);
-    // console.log(selectedParticipant.selectedTeams.includes(team));
     if (selectedParticipant.selectedTeams.includes(team))
       return alert("You can't select same team twice! Pick different team");
     selectedParticipant.selectedTeams.push(team);
-    console.log(selectedParticipant.selectedTeams);
+
+    localStorage.setItem("MY_APP", JSON.stringify(participants));
+
+    console.log(selectedParticipant);
+    console.log(participants);
   }
+  // useEffect(() => {
+  //   localStorage.setItem("MY_APP", JSON.stringify(participants));
+  //   console.log(participants);
+  // }, [participants]);
 
   function teamSelection(e) {
     setTeam(e.target.value);
   }
-
   return (
     <div className="App">
       <div className="section--1">
@@ -96,6 +96,34 @@ export default function App() {
     </div>
   );
 }
+
+// Example
+// function Input() {
+//   const storedItems = JSON.parse(localStorage.getItem("MY_APP"));
+
+//   const [input, setInput] = useState(storedItems);
+//   console.log(input);
+//   // useEffect(() => {
+//   //   const storedData = window.localStorage.getItem("MY_APP");
+//   //   if (storedData !== null) setInput(JSON.parse(storedData));
+//   // }, []);
+
+//   useEffect(() => {
+//     localStorage.setItem("MY_APP", JSON.stringify(input));
+//   }, [input]);
+
+//   function someInput(e) {
+//     setInput(e.target.value);
+//   }
+//   return (
+//     <div>
+//       <form onSubmit={(e) => e.preventDefault()}>
+//         <input type="text" onChange={someInput} />
+//         <button type="submit">Submit</button>
+//       </form>
+//     </div>
+//   );
+// }
 
 function ParticipantList({
   participants,
@@ -131,12 +159,12 @@ function Participant({
 
   return (
     <li
-      key={participant.id}
       className={`participant ${
         participant.favouriteTeam === "Chelsea FC"
           ? "chelsea-background"
           : "manutd-background"
       }`}
+      key={participant.id}
     >
       <div className="participant-block" onClick={handlePoints}>
         <h3>{participant.name}</h3>
