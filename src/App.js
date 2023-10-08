@@ -36,6 +36,9 @@ export default function App() {
   const [selectTeam, setSelectTeam] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [team, setTeam] = useState("");
+  const [isSelected, setIsSelected] = useState(false);
+
+  // console.log(isSelected);
 
   useEffect(() => {
     const data = localStorage.getItem("MY_APP");
@@ -44,22 +47,30 @@ export default function App() {
     if (data) setParticipants(JSON.parse(data));
     // return data ? JSON.parse(data) : [];
   }, []);
-  function showFormSelectTeam() {
-    setSelectTeam((show) => !show);
-  }
+
+  // function showFormSelectTeam() {
+  //   setSelectTeam((show) => !show);
+  // }
+
   function hideFormSelectTeam() {
     setSelectTeam(false);
   }
 
   function handleSelection(participant) {
-    showFormSelectTeam();
-    setSelectedParticipant(participant);
+    // showFormSelectTeam();
+    // if (participant?.id !== selectedParticipant?.id)
+    setSelectTeam((show) => !show);
+
+    setSelectedParticipant((cur) =>
+      cur?.id === participant.id ? null : participant
+    );
   }
 
   function handleSubmitForm(e) {
     e.preventDefault();
+
     hideFormSelectTeam();
-    if (selectedParticipant.selectedTeams.includes(team))
+    if (selectedParticipant.selectedTeams?.includes(team))
       return alert("You can't select same team twice! Pick different team");
     selectedParticipant.selectedTeams.push(team);
 
@@ -67,7 +78,10 @@ export default function App() {
 
     console.log(selectedParticipant);
     console.log(participants);
+
+    setSelectedParticipant(null);
   }
+
   // useEffect(() => {
   //   localStorage.setItem("MY_APP", JSON.stringify(participants));
   //   console.log(participants);
@@ -76,13 +90,16 @@ export default function App() {
   function teamSelection(e) {
     setTeam(e.target.value);
   }
+
   return (
     <div className="App">
       <div className="section--1">
         <ParticipantList
           participants={participants}
-          onShowFormSelectTeam={showFormSelectTeam}
+          // onShowFormSelectTeam={showFormSelectTeam}
           onHandleSelection={handleSelection}
+          selectedParticipant={selectedParticipant}
+          setIsSelected={setIsSelected}
         />
         {selectTeam && (
           <FormSelectTeam
@@ -129,6 +146,8 @@ function ParticipantList({
   participants,
   onShowFormSelectTeam,
   onHandleSelection,
+  selectedParticipant,
+  setIsSelected,
 }) {
   return (
     <ul className="participant-list">
@@ -139,6 +158,8 @@ function ParticipantList({
           score={participant.score}
           onShowFormSelectTeam={onShowFormSelectTeam}
           onHandleSelection={onHandleSelection}
+          selectedParticipant={selectedParticipant}
+          setIsSelected={setIsSelected}
         />
       ))}
     </ul>
@@ -150,11 +171,15 @@ function Participant({
   score,
   onShowFormSelectTeam,
   onHandleSelection,
+  selectedParticipant,
+  setIsSelected,
 }) {
-  const [points1, setPoints1] = useState(score);
+  const [points, setPoints] = useState(score);
+
+  const isSelected = selectedParticipant?.id === participant?.id;
 
   function handlePoints() {
-    setPoints1(() => points1 + 1);
+    setPoints(() => points + 1);
   }
 
   return (
@@ -168,10 +193,14 @@ function Participant({
     >
       <div className="participant-block" onClick={handlePoints}>
         <h3>{participant.name}</h3>
-        <p className="points">{points1}</p>
+        <p className="points">{points}</p>
       </div>
-      <Button onClick={() => onHandleSelection(participant)}>Pick Team</Button>
-      <p>Following gameweek team: {[...participant.selectedTeams.slice(-1)]}</p>
+      <Button onClick={() => onHandleSelection(participant)}>
+        {isSelected ? "Close" : "Pick team"}
+      </Button>
+      <p>
+        Following gameweek team: {[...participant.selectedTeams?.slice(-1)]}
+      </p>
       {/* <div>
         <p>{participant.selectedTeams}</p>
       </div> */}
@@ -238,7 +267,11 @@ function FormSelectTeam({ onHandleSubmitForm, teamSelection }) {
       <form className="team-selection__form" onSubmit={onHandleSubmitForm}>
         <div>
           <label>Select league</label>
-          <select value={league} onChange={(e) => setLeague(e.target.value)}>
+          <select
+            value={league}
+            required
+            onChange={(e) => setLeague(e.target.value)}
+          >
             <option disabled value="">
               -- League --
             </option>
@@ -249,7 +282,7 @@ function FormSelectTeam({ onHandleSubmitForm, teamSelection }) {
 
         {league === "premierLeague" && (
           <div>
-            <select onChange={teamSelection}>
+            <select required onChange={teamSelection}>
               <option disabled selected value="">
                 -- Team --
               </option>
@@ -313,7 +346,7 @@ function ParticipantsSelectedTeams({ participants }) {
           {participant.name} -
           {/* {participants.map((teams) => [...teams.selectedTeams])} */}
           {/* <span>{[...participant.selectedTeams]}</span> */}
-          {participant.selectedTeams.map((teams, i) => (
+          {participant.selectedTeams?.map((teams, i) => (
             <span key={participant.id}>
               {(i ? `, (${i + 1}) ` : "(1) ") + teams}
 
