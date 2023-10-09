@@ -59,8 +59,12 @@ export default function App() {
   function handleSelection(participant) {
     // showFormSelectTeam();
     // if (participant?.id !== selectedParticipant?.id)
-    setSelectTeam((show) => !show);
 
+    // setSelectTeam((show) => !show);
+    // setSelectTeam(true);
+    setSelectTeam((show) =>
+      selectedParticipant?.id === participant.id ? !show : true
+    );
     setSelectedParticipant((cur) =>
       cur?.id === participant.id ? null : participant
     );
