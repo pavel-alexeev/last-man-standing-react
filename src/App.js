@@ -37,37 +37,32 @@ export default function App() {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [team, setTeam] = useState("");
   const [isSelected, setIsSelected] = useState(false);
-
-  // console.log(isSelected);
+  const [points, setPoints] = useState(0);
 
   useEffect(() => {
     const data = localStorage.getItem("MY_APP");
-    // setParticipants(JSON.parse(data));
-    // const items = JSON.parse(localStorage.getItem("MY_APP"));
     if (data) setParticipants(JSON.parse(data));
-    // return data ? JSON.parse(data) : [];
   }, []);
-
-  // function showFormSelectTeam() {
-  //   setSelectTeam((show) => !show);
-  // }
 
   function hideFormSelectTeam() {
     setSelectTeam(false);
   }
 
   function handleSelection(participant) {
-    // showFormSelectTeam();
-    // if (participant?.id !== selectedParticipant?.id)
-
-    // setSelectTeam((show) => !show);
-    // setSelectTeam(true);
     setSelectTeam((show) =>
       selectedParticipant?.id === participant.id ? !show : true
     );
     setSelectedParticipant((cur) =>
       cur?.id === participant.id ? null : participant
     );
+  }
+
+  function updateScore(e) {
+    e.preventDefault();
+    console.log(selectedParticipant);
+    // selectedParticipant.score = 20;
+    // console.log(participant.score);
+    // participant.score++;
   }
 
   function handleSubmitForm(e) {
@@ -86,11 +81,6 @@ export default function App() {
     setSelectedParticipant(null);
   }
 
-  // useEffect(() => {
-  //   localStorage.setItem("MY_APP", JSON.stringify(participants));
-  //   console.log(participants);
-  // }, [participants]);
-
   function teamSelection(e) {
     setTeam(e.target.value);
   }
@@ -100,10 +90,10 @@ export default function App() {
       <div className="section--1">
         <ParticipantList
           participants={participants}
-          // onShowFormSelectTeam={showFormSelectTeam}
           onHandleSelection={handleSelection}
           selectedParticipant={selectedParticipant}
           setIsSelected={setIsSelected}
+          points={points}
         />
         {selectTeam && (
           <FormSelectTeam
@@ -114,37 +104,13 @@ export default function App() {
         )}
       </div>
       <ParticipantsSelectedTeams participants={participants} />
+      <div className="addPointsBtn">
+        <Button>Add Points</Button>
+        <PointsUpdate updateScore={updateScore} participants={participants} />
+      </div>
     </div>
   );
 }
-
-// Example
-// function Input() {
-//   const storedItems = JSON.parse(localStorage.getItem("MY_APP"));
-
-//   const [input, setInput] = useState(storedItems);
-//   console.log(input);
-//   // useEffect(() => {
-//   //   const storedData = window.localStorage.getItem("MY_APP");
-//   //   if (storedData !== null) setInput(JSON.parse(storedData));
-//   // }, []);
-
-//   useEffect(() => {
-//     localStorage.setItem("MY_APP", JSON.stringify(input));
-//   }, [input]);
-
-//   function someInput(e) {
-//     setInput(e.target.value);
-//   }
-//   return (
-//     <div>
-//       <form onSubmit={(e) => e.preventDefault()}>
-//         <input type="text" onChange={someInput} />
-//         <button type="submit">Submit</button>
-//       </form>
-//     </div>
-//   );
-// }
 
 function ParticipantList({
   participants,
@@ -152,6 +118,7 @@ function ParticipantList({
   onHandleSelection,
   selectedParticipant,
   setIsSelected,
+  points,
 }) {
   return (
     <ul className="participant-list">
@@ -159,32 +126,16 @@ function ParticipantList({
         <Participant
           participant={participant}
           key={participant.id}
-          score={participant.score}
-          onShowFormSelectTeam={onShowFormSelectTeam}
           onHandleSelection={onHandleSelection}
           selectedParticipant={selectedParticipant}
-          setIsSelected={setIsSelected}
         />
       ))}
     </ul>
   );
 }
 
-function Participant({
-  participant,
-  score,
-  onShowFormSelectTeam,
-  onHandleSelection,
-  selectedParticipant,
-  setIsSelected,
-}) {
-  const [points, setPoints] = useState(score);
-
+function Participant({ participant, onHandleSelection, selectedParticipant }) {
   const isSelected = selectedParticipant?.id === participant?.id;
-
-  function handlePoints() {
-    setPoints(() => points + 1);
-  }
 
   return (
     <li
@@ -195,9 +146,9 @@ function Participant({
       }`}
       key={participant.id}
     >
-      <div className="participant-block" onClick={handlePoints}>
+      <div className="participant-block">
         <h3>{participant.name}</h3>
-        <p className="points">{points}</p>
+        <p className="points">{participant.score}</p>
       </div>
       <Button onClick={() => onHandleSelection(participant)}>
         {isSelected ? "Close" : "Pick team"}
@@ -214,7 +165,6 @@ function Participant({
 
 function FormSelectTeam({ onHandleSubmitForm, teamSelection }) {
   const [league, setLeague] = useState("");
-  // const [team, setTeam] = useState("");
 
   const premierLeagueTeams = [
     "Arsenal",
@@ -291,14 +241,7 @@ function FormSelectTeam({ onHandleSubmitForm, teamSelection }) {
                 -- Team --
               </option>
               {premierLeagueTeams.map((team) => (
-                <option
-                // value={
-                //   team[0].toLowerCase() +
-                //   team.substring(1).split(" ").join("")
-                // }
-                >
-                  {team}
-                </option>
+                <option>{team}</option>
               ))}
             </select>
           </div>
@@ -359,6 +302,60 @@ function ParticipantsSelectedTeams({ participants }) {
           ))}
         </p>
       ))}
+    </div>
+  );
+}
+
+function PointsUpdate({ updateScore, participants }) {
+  const [participant, setParticipant] = useState(participants);
+  const [participantPoints, setParticipantPoints] = useState(null);
+  const selectedParticipant = participant[0];
+  console.log(selectedParticipant);
+  console.log(participantPoints);
+
+  function scoreUpdate(e) {
+    e.preventDefault();
+    // setParticipantPoints(selectedParticipant.score + participantPoints);
+    // setParticipant()
+    setParticipant({
+      ...participant,
+      ...participant,
+    });
+  }
+  console.log(participant);
+
+  return (
+    <div>
+      <h3>Adding points</h3>
+      <form onSubmit={scoreUpdate}>
+        <label>Select participant</label>
+        <select
+          onChange={(e) =>
+            setParticipant(
+              participants.filter((person) => person.name === e.target.value)
+            )
+          }
+        >
+          <option disabled value="" selected>
+            -- Participant --
+          </option>
+          {participants.map((participant) => (
+            <option>
+              {participant.name}
+              {}
+            </option>
+          ))}
+        </select>
+        <select
+          value={participantPoints}
+          onChange={(e) => setParticipantPoints(Number(e.target.value))}
+        >
+          {Array.from({ length: 11 }, (_, i) => i - 1 + 1).map((num) => (
+            <option>{num}</option>
+          ))}
+        </select>
+        <Button>Add</Button>
+      </form>
     </div>
   );
 }
