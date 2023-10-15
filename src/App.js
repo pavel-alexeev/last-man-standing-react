@@ -3,21 +3,21 @@ import { useState, useEffect } from "react";
 const gameParticipants = [
   {
     name: "Pavels Aleksejevs",
-    score: 4,
+    score: 0,
     id: 1,
     favouriteTeam: "Chelsea FC",
     selectedTeams: [],
   },
   {
     name: "Andy Keaveney",
-    score: 8,
+    score: 0,
     id: 2,
     favouriteTeam: "Chelsea FC",
     selectedTeams: [],
   },
   {
     name: "Martin Stevenson",
-    score: 7,
+    score: 0,
     id: 3,
     favouriteTeam: "Manchester United",
     selectedTeams: [],
@@ -38,6 +38,7 @@ export default function App() {
   const [team, setTeam] = useState("");
   const [isSelected, setIsSelected] = useState(false);
   const [points, setPoints] = useState(0);
+  const [updatePoints, setUpdatePoints] = useState(false);
 
   useEffect(() => {
     const data = localStorage.getItem("MY_APP");
@@ -57,12 +58,44 @@ export default function App() {
     );
   }
 
-  function updateScore(e) {
-    e.preventDefault();
-    console.log(selectedParticipant);
-    // selectedParticipant.score = 20;
-    // console.log(participant.score);
-    // participant.score++;
+  function updateScore(player, points) {
+    const currentParticipantIndex = participants.findIndex(
+      (participant) => participant?.id === player[0]?.id
+    );
+
+    const curPlayer = participants[currentParticipantIndex];
+
+    if (curPlayer?.score <= 21) {
+      const updatedParticipant = {
+        ...curPlayer,
+        score: curPlayer.score + points,
+      };
+
+      const newParticipants = [...participants];
+      newParticipants[currentParticipantIndex] = updatedParticipant;
+      setParticipants(newParticipants);
+      console.log(curPlayer.score);
+      console.log(participants);
+
+      if (curPlayer?.score === 21) {
+        alert("You win!");
+      }
+    }
+
+    if (curPlayer?.score > 21) {
+      const updatedParticipant = {
+        ...curPlayer,
+        score: curPlayer.score - points,
+      };
+
+      const newParticipants = [...participants];
+      newParticipants[currentParticipantIndex] = updatedParticipant;
+      setParticipants(newParticipants);
+    }
+  }
+
+  function participantLocStorage() {
+    localStorage.setItem("MY_APP", JSON.stringify(participants));
   }
 
   function handleSubmitForm(e) {
@@ -72,11 +105,10 @@ export default function App() {
     if (selectedParticipant.selectedTeams?.includes(team))
       return alert("You can't select same team twice! Pick different team");
     selectedParticipant.selectedTeams.push(team);
+    participantLocStorage();
 
-    localStorage.setItem("MY_APP", JSON.stringify(participants));
-
-    console.log(selectedParticipant);
-    console.log(participants);
+    // console.log(selectedParticipant);
+    // console.log(participants);
 
     setSelectedParticipant(null);
   }
@@ -85,8 +117,24 @@ export default function App() {
     setTeam(e.target.value);
   }
 
+  function showUpdatePoints() {
+    // console.log(
+    //   participants.map((person) => console.log(person.selectedTeams))
+    // );
+    if (participants.map((person) => person.selectedTeams.length > 1)) {
+      alert(
+        "You can't update points before at least one selection has been made"
+      );
+    } else {
+      setUpdatePoints((show) => !show);
+    }
+
+    if (selectTeam === true) alert("Please select League and Team first");
+  }
+
   return (
     <div className="App">
+      <h1>Last Man Standing</h1>
       <div className="section--1">
         <ParticipantList
           participants={participants}
@@ -94,6 +142,7 @@ export default function App() {
           selectedParticipant={selectedParticipant}
           setIsSelected={setIsSelected}
           points={points}
+          onUpdatePoints={setUpdatePoints}
         />
         {selectTeam && (
           <FormSelectTeam
@@ -104,10 +153,19 @@ export default function App() {
         )}
       </div>
       <ParticipantsSelectedTeams participants={participants} />
-      <div className="addPointsBtn">
-        <Button>Add Points</Button>
-        <PointsUpdate updateScore={updateScore} participants={participants} />
+      <div className="update-points">
+        <Button onClick={showUpdatePoints}>
+          {updatePoints === false ? "Update points" : "Close"}
+        </Button>
+        {updatePoints && (
+          <PointsUpdate
+            updateScore={updateScore}
+            participants={participants}
+            participantLocStorage={participantLocStorage}
+          />
+        )}
       </div>
+      <ClearData setParticipants={setParticipants} />
     </div>
   );
 }
@@ -119,6 +177,7 @@ function ParticipantList({
   selectedParticipant,
   setIsSelected,
   points,
+  onUpdatePoints,
 }) {
   return (
     <ul className="participant-list">
@@ -128,14 +187,22 @@ function ParticipantList({
           key={participant.id}
           onHandleSelection={onHandleSelection}
           selectedParticipant={selectedParticipant}
+          onUpdatePoints={onUpdatePoints}
         />
       ))}
     </ul>
   );
 }
 
-function Participant({ participant, onHandleSelection, selectedParticipant }) {
+function Participant({
+  participant,
+  onHandleSelection,
+  selectedParticipant,
+  onUpdatePoints,
+}) {
   const isSelected = selectedParticipant?.id === participant?.id;
+
+  if (isSelected === true) onUpdatePoints(false);
 
   return (
     <li
@@ -143,7 +210,7 @@ function Participant({ participant, onHandleSelection, selectedParticipant }) {
         participant.favouriteTeam === "Chelsea FC"
           ? "chelsea-background"
           : "manutd-background"
-      }`}
+      } ${isSelected && "selected"} `}
       key={participant.id}
     >
       <div className="participant-block">
@@ -306,28 +373,29 @@ function ParticipantsSelectedTeams({ participants }) {
   );
 }
 
-function PointsUpdate({ updateScore, participants }) {
-  const [participant, setParticipant] = useState(participants);
+function PointsUpdate({ updateScore, participants, participantLocStorage }) {
+  const [participant, setParticipant] = useState("");
   const [participantPoints, setParticipantPoints] = useState(null);
-  const selectedParticipant = participant[0];
-  console.log(selectedParticipant);
-  console.log(participantPoints);
 
   function scoreUpdate(e) {
     e.preventDefault();
-    // setParticipantPoints(selectedParticipant.score + participantPoints);
-    // setParticipant()
-    setParticipant({
-      ...participant,
-      ...participant,
-    });
+
+    if (!participant) {
+      setParticipantPoints(0);
+      return;
+    }
+
+    updateScore(participant, participantPoints);
+    // setParticipant("");
+    setParticipantPoints(0);
   }
+
   console.log(participant);
 
   return (
-    <div>
+    <div className="update-points__form">
       <h3>Adding points</h3>
-      <form onSubmit={scoreUpdate}>
+      <form onSubmit={scoreUpdate} className="update-points__form--main">
         <label>Select participant</label>
         <select
           onChange={(e) =>
@@ -340,9 +408,8 @@ function PointsUpdate({ updateScore, participants }) {
             -- Participant --
           </option>
           {participants.map((participant) => (
-            <option>
+            <option required key={participant.id} value={participant.name}>
               {participant.name}
-              {}
             </option>
           ))}
         </select>
@@ -354,8 +421,26 @@ function PointsUpdate({ updateScore, participants }) {
             <option>{num}</option>
           ))}
         </select>
-        <Button>Add</Button>
+        <Button onClick={participantLocStorage()}>Add</Button>
       </form>
+    </div>
+  );
+}
+
+function ClearData({ setParticipants }) {
+  function dataClear() {
+    let result = window.confirm("Are you sure you want to clear all data?");
+    if (result) {
+      localStorage.removeItem("MY_APP");
+    }
+
+    setParticipants(gameParticipants);
+    window.location.reload();
+  }
+
+  return (
+    <div className="reset-data">
+      <Button onClick={dataClear}>Reset Data</Button>
     </div>
   );
 }
