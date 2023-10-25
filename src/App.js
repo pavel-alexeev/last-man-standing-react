@@ -121,14 +121,14 @@ export default function App() {
     // console.log(
     //   participants.map((person) => console.log(person.selectedTeams))
     // );
-    if (participants.map((person) => person.selectedTeams.length > 1)) {
-      alert(
-        "You can't update points before at least one selection has been made"
-      );
-    } else {
-      setUpdatePoints((show) => !show);
-    }
-
+    // if (participants.map((person) => person.selectedTeams.length > 1)) {
+    //   alert(
+    //     "You can't update points before at least one selection has been made"
+    //   );
+    // } else {
+    //   setUpdatePoints((show) => !show);
+    // }
+    setUpdatePoints((show) => !show);
     if (selectTeam === true) alert("Please select League and Team first");
   }
 
